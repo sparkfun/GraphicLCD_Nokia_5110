@@ -263,8 +263,8 @@ void loop(void) {
 }
 
 void gotoXY(int x, int y) {
-  LCDWrite(0, 0x80 | x);  // Column.
-  LCDWrite(0, 0x40 | y);  // Row.  ?
+  LCDWrite(LCD_COMMAND, 0x80 | x);  // Column.
+  LCDWrite(LCD_COMMAND, 0x40 | y);  // Row.  ?
 }
 
 //This takes a large array of bits and sends them to the LCD
