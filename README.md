@@ -7,6 +7,10 @@ Repository Contents
 -------------------
 * **/Firmware** - Example firmware to run the LCD screen.
 
+Documentation
+--------------
+* **[SparkFun 3D Model repo](https://github.com/sparkfun/3D_Models)** - 3D models of SparkFun products. 
+
 License Information
 -------------------
 All code is open source so please feel free to do anything you want with it; 
