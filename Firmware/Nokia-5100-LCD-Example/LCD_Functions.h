@@ -1,8 +1,8 @@
 #include <Arduino.h>
 
-/* Pin definitions: 
+/* Pin definitions:
 Most of these pins can be moved to any digital or analog pin.
-DN(MOSI)and SCLK should be left where they are (SPI pins). The 
+DN(MOSI)and SCLK should be left where they are (SPI pins). The
 LED (backlight) pin should remain on a PWM-capable pin. */
 const int scePin = 7;   // SCE - Chip select, pin 3 on LCD.
 const int rstPin = 6;   // RST - Reset, pin 4 on LCD.
@@ -12,7 +12,7 @@ const int sclkPin = 13;  // SCLK - Serial clock, pin 7 on LCD.
 const int blPin = 9;    // LED - Backlight LED, pin 8 on LCD.
 
 /* PCD8544-specific defines: */
-#define LCD_COMMAND  0 
+#define LCD_COMMAND  0
 #define LCD_DATA     1
 
 /* 84x48 LCD Defines: */
@@ -26,10 +26,10 @@ This table contains the hex values that represent pixels for a
 font that is 5 pixels wide and 8 pixels high. Each byte in a row
 represents one, 8-pixel, vertical column of a character. 5 bytes
 per character. */
-static const byte ASCII[][5] = {
+static const byte ASCII[][5] PROGMEM = {
   // First 32 characters (0x00-0x19) are ignored. These are
   // non-displayable, control characters.
-   {0x00, 0x00, 0x00, 0x00, 0x00} // 0x20  
+   {0x00, 0x00, 0x00, 0x00, 0x00} // 0x20
   ,{0x00, 0x00, 0x5f, 0x00, 0x00} // 0x21 !
   ,{0x00, 0x07, 0x00, 0x07, 0x00} // 0x22 "
   ,{0x14, 0x7f, 0x14, 0x7f, 0x14} // 0x23 #
@@ -103,7 +103,7 @@ static const byte ASCII[][5] = {
   ,{0x0c, 0x52, 0x52, 0x52, 0x3e} // 0x67 g
   ,{0x7f, 0x08, 0x04, 0x04, 0x78} // 0x68 h
   ,{0x00, 0x44, 0x7d, 0x40, 0x00} // 0x69 i
-  ,{0x20, 0x40, 0x44, 0x3d, 0x00} // 0x6a j 
+  ,{0x20, 0x40, 0x44, 0x3d, 0x00} // 0x6a j
   ,{0x7f, 0x10, 0x28, 0x44, 0x00} // 0x6b k
   ,{0x00, 0x41, 0x7f, 0x40, 0x00} // 0x6c l
   ,{0x7c, 0x04, 0x18, 0x04, 0x78} // 0x6d m
@@ -131,7 +131,7 @@ static const byte ASCII[][5] = {
 pixels on our display. There are 504 total bits in this array,
 same as how many pixels there are on a 84 x 48 display.
 
-Each byte in this array covers a 8-pixel vertical block on the 
+Each byte in this array covers a 8-pixel vertical block on the
 display. Each successive byte covers the next 8-pixel column over
 until you reach the right-edge of the display and step down 8 rows.
 
@@ -139,10 +139,10 @@ To update the display, we first have to write to this array, then
 call the updateDisplay() function, which sends this whole array
 to the PCD8544.
 
-Because the PCD8544 won't let us write individual pixels at a 
+Because the PCD8544 won't let us write individual pixels at a
 time, this is how we can make targeted changes to the display. */
 byte displayMap[LCD_WIDTH * LCD_HEIGHT / 8] = {
-  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, // (0,0)->(11,7) ~ These 12 bytes cover an 8x12 block in the left corner of the display 
+  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, // (0,0)->(11,7) ~ These 12 bytes cover an 8x12 block in the left corner of the display
   0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, // (12,0)->(23,7)
   0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xE0, // (24,0)->(35,7)
   0xF0, 0xF8, 0xFC, 0xFC, 0xFE, 0xFE, 0xFE, 0xFE, 0x1E, 0x0E, 0x02, 0x00, // (36,0)->(47,7)
@@ -187,12 +187,12 @@ byte displayMap[LCD_WIDTH * LCD_HEIGHT / 8] = {
 };
 
 // There are two memory banks in the LCD, data/RAM and commands.
-// This function sets the DC pin high or low depending, and then 
+// This function sets the DC pin high or low depending, and then
 // sends the data byte
-void LCDWrite(byte data_or_command, byte data) 
+void LCDWrite(byte data_or_command, byte data)
 {
   //Tell the LCD that we are writing either to data or a command
-  digitalWrite(dcPin, data_or_command); 
+  digitalWrite(dcPin, data_or_command);
 
   //Send the data
   digitalWrite(scePin, LOW);
@@ -209,7 +209,7 @@ void setPixel(int x, int y, boolean bw)
   if ((x >= 0) && (x < LCD_WIDTH) && (y >= 0) && (y < LCD_HEIGHT))
   {
     byte shift = y % 8;
-  
+
     if (bw) // If black, set the bit.
       displayMap[x + (y/8)*LCD_WIDTH] |= 1<<shift;
     else   // If white clear the bit.
@@ -229,7 +229,7 @@ void clearPixel(int x, int y)
 }
 
 // setLine draws a line from x0,y0 to x1,y1 with the set color.
-// This function was grabbed from the SparkFun ColorLCDShield 
+// This function was grabbed from the SparkFun ColorLCDShield
 // library.
 void setLine(int x0, int y0, int x1, int y1, boolean bw)
 {
@@ -257,7 +257,7 @@ void setLine(int x0, int y0, int x1, int y1, boolean bw)
   dx <<= 1; // dx is now 2*dx
   setPixel(x0, y0, bw); // Draw the first pixel.
 
-  if (dx > dy) 
+  if (dx > dy)
   {
     int fraction = dy - (dx >> 1);
     while (x0 != x1)
@@ -318,7 +318,7 @@ void setRect(int x0, int y0, int x1, int y1, boolean fill, boolean bw)
       xDiff--;
     }
   }
-  else 
+  else
   {
     // best way to draw an unfilled rectangle is to draw four lines
     setLine(x0, y0, x1, y0, bw);
@@ -331,7 +331,7 @@ void setRect(int x0, int y0, int x1, int y1, boolean fill, boolean bw)
 // setCircle draws a circle centered around x0,y0 with a defined
 // radius. The circle can be black or white. And have a line
 // thickness ranging from 1 to the radius of the circle.
-// This function was grabbed from the SparkFun ColorLCDShield 
+// This function was grabbed from the SparkFun ColorLCDShield
 // library.
 void setCircle (int x0, int y0, int radius, boolean bw, int lineThickness)
 {
@@ -381,7 +381,7 @@ void setChar(char character, int x, int y, boolean bw)
   byte column; // temp byte to store character's column bitmap
   for (int i=0; i<5; i++) // 5 columns (x) per character
   {
-    column = ASCII[character - 0x20][i];
+    column = pgm_read_byte(&ASCII[character - 0x20][i]);
     for (int j=0; j<8; j++) // 8 rows (y) per character
     {
       if (column & (0x01 << j)) // test bits to set pixels
@@ -418,10 +418,14 @@ void setStr(char * dString, int x, int y, boolean bw)
 // This function will draw an array over the screen. (For now) the
 // array must be the same size as the screen, covering the entirety
 // of the display.
-void setBitmap(char * bitArray)
+// Also, the array must reside in FLASH and declared with PROGMEM.
+void setBitmap(const char * bitArray)
 {
   for (int i=0; i<(LCD_WIDTH * LCD_HEIGHT / 8); i++)
-    displayMap[i] = bitArray[i];
+  {
+    char c = pgm_read_byte(&bitArray[i]);
+    displayMap[i] = c;
+  }
 }
 
 // This function clears the entire display either white (0) or
@@ -438,7 +442,7 @@ void clearDisplay(boolean bw)
   }
 }
 
-// Helpful function to directly command the LCD to go to a 
+// Helpful function to directly command the LCD to go to a
 // specific x,y coordinate.
 void gotoXY(int x, int y)
 {
@@ -460,7 +464,7 @@ void updateDisplay()
 // Set contrast can set the LCD Vop to a value between 0 and 127.
 // 40-60 is usually a pretty good range.
 void setContrast(byte contrast)
-{  
+{
   LCDWrite(LCD_COMMAND, 0x21); //Tell LCD that extended commands follow
   LCDWrite(LCD_COMMAND, 0x80 | contrast); //Set LCD Vop (Contrast): Try 0xB1(good @ 3.3V) or 0xBF if your display is too dark
   LCDWrite(LCD_COMMAND, 0x20); //Set display mode
@@ -468,7 +472,7 @@ void setContrast(byte contrast)
 
 /* There are two ways to do this. Either through direct commands
 to the display, or by swapping each bit in the displayMap array.
-We'll leave both methods here, comment one or the other out if 
+We'll leave both methods here, comment one or the other out if
 you please. */
 void invertDisplay()
 {
@@ -476,7 +480,7 @@ void invertDisplay()
   LCDWrite(LCD_COMMAND, 0x20); //Tell LCD that extended commands follow
   LCDWrite(LCD_COMMAND, 0x08 | 0x05); //Set LCD Vop (Contrast): Try 0xB1(good @ 3.3V) or 0xBF if your display is too dark
   LCDWrite(LCD_COMMAND, 0x20); //Set display mode  */
-  
+
   /* Indirect, swap bits in displayMap option: */
   for (int i=0; i < (LCD_WIDTH * LCD_HEIGHT / 8); i++)
   {
@@ -486,7 +490,7 @@ void invertDisplay()
 }
 
 //This sends the magical commands to the PCD8544
-void lcdBegin(void) 
+void lcdBegin(void)
 {
   //Configure control pins
   pinMode(scePin, OUTPUT);
@@ -500,7 +504,7 @@ void lcdBegin(void)
   SPI.begin();
   SPI.setDataMode(SPI_MODE0);
   SPI.setBitOrder(MSBFIRST);
-  
+
   //Reset the LCD to a known state
   digitalWrite(rstPin, LOW);
   digitalWrite(rstPin, HIGH);
@@ -510,7 +514,7 @@ void lcdBegin(void)
   LCDWrite(LCD_COMMAND, 0x04); //Set Temp coefficent
   LCDWrite(LCD_COMMAND, 0x14); //LCD bias mode 1:48 (try 0x13)
   //We must send 0x20 before modifying the display control mode
-  LCDWrite(LCD_COMMAND, 0x20); 
+  LCDWrite(LCD_COMMAND, 0x20);
   LCDWrite(LCD_COMMAND, 0x0C); //Set display control, normal mode.
 }
 
