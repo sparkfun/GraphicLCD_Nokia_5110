@@ -7,7 +7,8 @@
     adapted from code by Nathan Seidle and mish-mashed with
     code from the ColorLCDShield.
   date: October 10, 2013
-  license: Beerware. Feel free to use, reuse, and modify this
+  license: Officially, the MIT License. Review the included License.md file
+  Unofficially, Beerware. Feel free to use, reuse, and modify this
   code as you see fit. If you find it useful, and we meet someday,
   you can buy me a beer.
   
