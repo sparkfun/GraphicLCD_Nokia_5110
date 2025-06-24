@@ -1,7 +1,7 @@
 Graphic LCD 84x48-Nokia 5110
 =====================
 
-![Graphic LCD 84x48](https://dlnmh9ip6v2uc.cloudfront.net/images/products/1/0/1/6/8/10168-01_i_ma.jpg)  
+![Graphic LCD 84x48](https://cdn.sparkfun.com/assets/parts/4/4/7/3/10168-01a.jpg)  
 
 [*Graphic LCD 84x48 Nokia 5110 (LCD-10168)*](https://www.sparkfun.com/products/10168)
 
